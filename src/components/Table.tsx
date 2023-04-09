@@ -130,7 +130,7 @@ export default function Table({listOfCity}: Props) {
                                 onChange={(e) => {
                                     handleStartDate(e)
                                 }}
-                                defaultValue={dayjs(new Date())}
+                                value={dayjs(new Date())}
                             />
                             <DatePicker
                                 label="End Date"
@@ -138,7 +138,7 @@ export default function Table({listOfCity}: Props) {
                                 onChange={(e) => {
                                     handleEndDate(e)
                                 }}
-                                defaultValue={dayjs(new Date())}
+                                value={dayjs(new Date())}
                             />
                         </div>
                         <div>
@@ -149,7 +149,7 @@ export default function Table({listOfCity}: Props) {
                                 onChange={(e) => {
                                     handleStartTime(e)
                                 }}
-                                defaultValue={dayjs("2022-04-17T08:00:00")}
+                                value={dayjs("2022-04-17T08:00:00")}
                             />
                             <TimeField
                                 label="End Time"
@@ -157,7 +157,7 @@ export default function Table({listOfCity}: Props) {
                                 onChange={(e) => {
                                     handleEndTime(e)
                                 }}
-                                defaultValue={dayjs("2022-04-17T23:00:00")}
+                                value={dayjs("2022-04-17T23:00:00")}
                             />
                         </div>
                     </div>
