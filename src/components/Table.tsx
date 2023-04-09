@@ -26,7 +26,8 @@ export default function Table({listOfCity}: Props) {
                 "start_date": startDate,
                 "end_date": endDate,
                 "start_time": startTime,
-                "end_time": endTime
+                "end_time": endTime,
+                "token" : "1234567890"
             }
         });
         setResult(response.data);
