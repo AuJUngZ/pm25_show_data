@@ -1,67 +1,22 @@
 import React, {useEffect} from "react";
-import axios from "axios";
-import Swal from "sweetalert2";
-import Image from "next/image";
+import {clearInputExport, handleUpload,} from "@/utils/UploadImg_Util";
 
 
 interface Props {
     data_id: number,
-    name : string
+    name: string
 }
 
 export default function UploadImg({data_id, name}: Props) {
     let [image, setImage] = React.useState<string>("");
 
-    const handleUpload = async () => {
-        try {
-            axios.defaults.baseURL = 'http://localhost/pm25';
-            const image = document.getElementById("image") as HTMLInputElement;
-            const formData = new FormData();
-            // @ts-ignore
-            formData.append("image", image.files[0]);
-            const response = await axios.post("/upload-img/upload", formData, {
-                headers: {
-                    "Content-Type": "multipart/form-data",
-                    "data_id": data_id,
-                    "token": "1234567890"
-                }
-            });
-            if (response.status === 200) {
-                Uploaded();
-                clearInput();
-                clearModal();
-            }
-        } catch (e) {
-            console.log(e)
-        }
-    }
-
     useEffect(() => {
-        if(name !== "next.svg"){
+        if (name !== "next.svg") {
             setImage(`http://localhost/pm25/public/img/${name}`);
-        }else{
+        } else {
             setImage(`/next.svg`);
         }
-    },[name])
-
-    const clearModal = () => {
-        const modal = document.getElementById("imageModal") as HTMLInputElement;
-        modal.click();
-    }
-
-    const clearInput = () => {
-        const image = document.getElementById("image") as HTMLInputElement;
-        image.value = ""
-    }
-
-    const Uploaded = () =>{
-        Swal.fire({
-            title: 'Success!',
-            text: 'Image has been uploaded',
-            icon: 'success',
-            confirmButtonText: 'Cool'
-        })
-    }
+    }, [name])
 
     return (
         <div className={"modal fade"} id={"imageModal"} aria-labelledby="imageModalLabel" aria-hidden="true">
@@ -85,18 +40,28 @@ export default function UploadImg({data_id, name}: Props) {
                     <div className={"modal-footer"}>
                         <button className={"btn btn-secondary"} data-bs-dismiss="modal"
                             //clear input file
-                                onClick={clearInput}
+                                onClick={() => {
+                                    clearInputExport();
+                                }}
                         >Close
                         </button>
                         <button className={"btn btn-primary"}
-                                onClick={handleUpload}
+                                onClick={() => {
+                                    handleUpload(data_id);
+                                }}
                         >Upload
                         </button>
                     </div>
                     <hr/>
                     <div className={"show image mb-5 mx-auto text-center"}>
                         <h5>Image Preview</h5>
-                        <img src={image} width={300} height={300} alt={"img"}/>
+                        <img src={image} width={400} height={300} alt={"img"}
+                             style={{
+                                 // objectFit: "cover",
+                                 // objectPosition: "center",
+                                 borderRadius: "10px",
+                             }}
+                        />
                     </div>
                 </div>
             </div>

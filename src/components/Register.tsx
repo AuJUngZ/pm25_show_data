@@ -1,90 +1,12 @@
 import React from "react";
 import auth from "../firebase/connect";
 import Swal from "sweetalert2";
+import {handleConfirmPassword, handleEmail, handlePassword, handleClose, handleRegister} from "@/utils/Register_Util";
 
 export default function Register() {
     const [email, setEmail] = React.useState("");
     const [password, setPassword] = React.useState("");
     const [confirmPassword, setConfirmPassword] = React.useState("");
-    const handleEmail = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setEmail(e.target.value);
-    }
-    const handlePassword = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setPassword(e.target.value);
-    }
-    const handleConfirmPassword = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setConfirmPassword(e.target.value);
-    }
-
-    const resetForm = () => {
-        setEmail("");
-        setPassword("");
-        setConfirmPassword("");
-        console.log("Email: ", email + " Password: " + password + " Confirm Password: " + confirmPassword);
-    }
-
-    const handleClose = () => {
-        resetForm();
-    }
-
-    const handleRegister = async () => {
-        try {
-            if (password === confirmPassword && password !== "" && email !== "") {
-                Swal.fire({
-                    title: 'You want to register?',
-                    text: 'Click ok to continue',
-                    icon: 'question',
-                    showCancelButton: true,
-                    confirmButtonText: 'Ok',
-                    cancelButtonText: 'Cancel'
-                }).then(async (result) => {
-                        if (result.isConfirmed) {
-                            try {
-                                const resp = await auth.createUserWithEmailAndPassword(email, password);
-                                const {user} = resp;
-                                //show success message then close automatically
-                                Swal.fire({
-                                    title: 'Register Success',
-                                    text: "welcome to our website",
-                                    icon: 'success',
-                                    timer: 2000,
-                                    timerProgressBar: true,
-                                    didOpen: () => {
-                                        Swal.showLoading()
-                                    }
-                                })
-                                resetForm();
-                                //reload page
-                                window.location.reload();
-                            } catch (e: any) {
-                                Swal.fire({
-                                    title: 'Register Error',
-                                    text: e.message,
-                                    icon: 'error',
-                                    confirmButtonText: 'Ok'
-                                })
-                            }
-                        }
-                    }
-                )
-            } else {
-                console.log("adad")
-                Swal.fire({
-                    title: 'Password Error',
-                    text: 'Please check your password and confirm password',
-                    icon: 'error',
-                    confirmButtonText: 'Ok'
-                })
-            }
-        } catch (e: any) {
-            Swal.fire({
-                title: 'Register Error',
-                text: e.message,
-                icon: 'error',
-                confirmButtonText: 'Ok'
-            })
-        }
-    }
 
     return (
         <div className="modal fade" id="registerModal" aria-labelledby="registerModalLabel"
@@ -93,32 +15,42 @@ export default function Register() {
                 <div className="modal-content">
                     <div className="modal-header">
                         <h5 className="modal-title" id="registerModalLabel">Register</h5>
-                        <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"
+                                onClick={() =>{
+                                    handleClose(setEmail, setPassword, setConfirmPassword)
+                                }}
+                        ></button>
                     </div>
                     <div className="modal-body">
                         <form>
                             <div className="mb-3">
                                 <label htmlFor="email" className="form-label">Email address</label>
-                                <input type="email" className="form-control" id="email"
-                                       onChange={handleEmail}
+                                <input type="email" className="form-control" id="email_register"
+                                       onChange={(e) => {
+                                           handleEmail(e, setEmail)
+                                       }}
                                        value={email}
                                        autoComplete={"off"}
                                 />
-                                <div id="emailHelp" className="form-text">We'll never share your email with anyone
+                                <div id="emailHelp" className="form-text">We will never share your email with anyone
                                     else.
                                 </div>
                             </div>
                             <div className="mb-3">
                                 <label htmlFor="password" className="form-label">Password</label>
-                                <input type="password" className="form-control" id="password"
-                                       onChange={handlePassword}
+                                <input type="password" className="form-control" id="password_init"
+                                       onChange={(e) => {
+                                           handlePassword(e, setPassword)
+                                       }}
                                        value={password}
                                 />
                             </div>
                             <div className="mb-3">
                                 <label htmlFor="password" className="form-label">Confirm Password</label>
-                                <input type="password" className="form-control" id="password"
-                                       onChange={handleConfirmPassword}
+                                <input type="password" className="form-control" id="password_confirm"
+                                       onChange={(e) => {
+                                           handleConfirmPassword(e, setConfirmPassword)
+                                       }}
                                        value={confirmPassword}
                                 />
                             </div>
@@ -126,11 +58,15 @@ export default function Register() {
                     </div>
                     <div className="modal-footer">
                         <button type="button" className="btn btn-secondary" data-bs-dismiss="modal"
-                                onClick={handleClose}
+                                onClick={() =>{
+                                    handleClose(setEmail, setPassword, setConfirmPassword)
+                                }}
                         >Close
                         </button>
                         <button type="button" className="btn btn-primary"
-                                onClick={handleRegister}
+                                onClick={() =>{
+                                    handleRegister(password, confirmPassword, email, setEmail, setPassword, setConfirmPassword)
+                                }}
                         >Register
                         </button>
                     </div>

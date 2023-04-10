@@ -5,6 +5,7 @@ import {DatePicker, LocalizationProvider, TimeField} from '@mui/x-date-pickers';
 import {AdapterDayjs} from '@mui/x-date-pickers/AdapterDayjs'
 import dayjs from "dayjs";
 import UploadImg from "@/components/UploadImg";
+import {handleOpenModal, fetchData, getCurrentDate, handleStartDate, handleEndDate, handleStartTime, handleEndTime, colorCode} from "@/utils/Table_Util";
 
 interface Props {
     listOfCity: string[]
@@ -14,125 +15,20 @@ export default function Table({listOfCity}: Props) {
     const [sortedBy, setSortedBy] = useState<string>("value ASC");
     const [result, setResult] = useState<any>([]);
     const [startDate, setStartDate] = useState<string>(getCurrentDate);
-    const [endDate, setEndDate] = useState<string>(getCurrentDate());
+    const [endDate, setEndDate] = useState<string>(getCurrentDate);
     const [startTime, setStartTime] = useState<string>("08:00:00");
     const [endTime, setEndTime] = useState<string>("23:00:00");
     const [selectedOption, setSelectedOption] = useState<number>();
     const [fileNames, setFileNames] = useState<string>();
 
-
-    const handleOpenModal = async (id: number) => {
-        axios.defaults.baseURL = 'http://localhost/pm25';
-        try {
-            const response = await axios.get('/upload-img/fetch', {
-                headers: {
-                    "data_id": id, "token": "1234567890"
-                }
-            });
-            setSelectedOption(id);
-            if (response.data.length > 0) {
-                setFileNames(response.data[0].name)
-            } else {
-                setFileNames("next.svg")
-            }
-            console.log(fileNames);
-        } catch (e) {
-            console.log(e)
-        }
-    }
-
-    //GET DATA FROM API
-    const fetchData = async (temp: string[]) => {
-        axios.defaults.baseURL = 'http://localhost/pm25';
-        const response = await axios.get(`/data/fetch/${temp[0]}`, {
-            headers: {
-                "sort_order": temp[1],
-                "start_date": startDate,
-                "end_date": endDate,
-                "start_time": startTime,
-                "end_time": endTime,
-                "token": "1234567890"
-            }
-        });
-        setResult(response.data);
-    }
-
     useEffect(() => {
         const temp = sortedBy.split(" ");
         try {
-            fetchData(temp)
+            fetchData(temp , setResult, startDate, endDate, startTime, endTime);
         } catch (e) {
             console.log(e)
         }
     }, [sortedBy, startDate, endDate, startTime, endTime, listOfCity])
-
-
-    function getCurrentDate() {
-        // @ts-ignore
-        const {$D: dd, $M, $y: yyyy} = dayjs(new Date());
-        const mm = $M + 1;
-        return `${yyyy}-${mm}-${dd}`
-    }
-
-    const handleStartDate = (e: any) => {
-        const {$y: yyyy, $M, $D: dd} = e;
-        const mm = $M + 1;
-        const date = `${yyyy}-${mm}-${dd}`;
-        setStartDate(date)
-    }
-
-    const handleEndDate = (e: any) => {
-        const yyyy = e.$y;
-        const mm = e.$M + 1;
-        const dd = e.$D;
-        const date = `${yyyy}-${mm}-${dd}`;
-        setEndDate(date)
-    }
-
-    const handleStartTime = (e: any) => {
-        const hh = e.$H;
-        const mm = e.$m;
-        const ss = e.$s;
-        const time = `${hh}:${mm}:${ss}`;
-        setStartTime(time)
-    }
-
-    const handleEndTime = (e: any) => {
-        const hh = e.$H;
-        const mm = e.$m;
-        const ss = e.$s;
-        const time = `${hh}:${mm}:${ss}`;
-        setEndTime(time)
-    }
-
-    const colorCode = (code: number) => {
-        let style;
-        if (code >= 0 && code <= 50) {
-            return style = {
-                color: "#1D8348",
-            }
-        } else if (code >= 51 && code <= 100) {
-            return style = {
-                color: "#B7950B"
-            }
-        } else if (code >= 101 && code <= 200) {
-            return style = {
-                color: "#BA4A00"
-            }
-        } else if (code >= 201 && code <= 300) {
-            return style = {
-                color: "#922B21"
-            }
-        } else if (code >= 301 && code <= 400) {
-            return style = {
-                color: "#5B2C6F"
-            }
-        } else if (code >= 401 && code <= 500) {
-            return style = {
-                color: "#5B2C6F"
-            }
-        }
-    }
 
     return (<div>
         <h3 className={"text-primary text-center mb-4 fw-light"}><u>Result of you keyword</u></h3>
@@ -153,17 +49,17 @@ export default function Table({listOfCity}: Props) {
                             className={"me-2"}
                             format={"YYYY-MM-DD"}
                             onChange={(e) => {
-                                handleStartDate(e)
+                                handleStartDate(e, setStartDate);
                             }}
-                            value={dayjs(new Date())}
+                            value={startDate !== getCurrentDate() ? dayjs(startDate) : dayjs(new Date())}
                         />
                         <DatePicker
                             label="End Date"
                             format={"YYYY-MM-DD"}
                             onChange={(e) => {
-                                handleEndDate(e)
+                                handleEndDate(e, setEndDate);
                             }}
-                            value={dayjs(new Date())}
+                            value={endDate !== getCurrentDate() ? dayjs(endDate) : dayjs(new Date())}
                         />
                     </div>
                     <div>
@@ -172,17 +68,17 @@ export default function Table({listOfCity}: Props) {
                             format={"HH:mm:ss"}
                             className={"me-2"}
                             onChange={(e) => {
-                                handleStartTime(e)
+                                handleStartTime(e, setStartTime);
                             }}
-                            value={dayjs("2022-04-17T08:00:00")}
+                            value={startTime !== "08:00:00" ? dayjs(`2023-04-17T${startTime}`) : dayjs("2023-04-17T08:00:00")}
                         />
                         <TimeField
                             label="End Time"
                             format={"HH:mm:ss"}
                             onChange={(e) => {
-                                handleEndTime(e)
+                                handleEndTime(e, setEndTime)
                             }}
-                            value={dayjs("2022-04-17T23:00:00")}
+                            value={endTime !== "23:00:00" ? dayjs(`2023-04-17T${endTime}`) : dayjs("2023-04-17T23:00:00")}
                         />
                     </div>
                 </div>
@@ -222,7 +118,7 @@ export default function Table({listOfCity}: Props) {
                             }}
                                        data-bs-toggle="modal" data-bs-target="#imageModal"
                                        onClick={() => {
-                                           handleOpenModal(data.id);
+                                           handleOpenModal(data.id, setFileNames, setSelectedOption);
                                        }}
                             />
                         </td>
@@ -245,7 +141,7 @@ export default function Table({listOfCity}: Props) {
                                         cursor: "pointer"
                                     }} data-bs-toggle="modal" data-bs-target="#imageModal"
                                                onClick={() => {
-                                                   handleOpenModal(data.id);
+                                                   handleOpenModal(data.id,setFileNames, setSelectedOption);
                                                }}
                                     />
                                 </td>
